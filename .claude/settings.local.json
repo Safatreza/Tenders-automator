@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Read(//d/Professional_Internship/**)",
+      "Bash(npm run dev:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(cat:*)",
+      "Bash(npm pkg set scripts.type-check=\"tsc --noEmit\" scripts.db:generate=\"prisma generate\" scripts.db:push=\"prisma db push\" scripts.db:migrate=\"prisma migrate dev\" scripts.db:seed=\"tsx prisma/seed.ts\" scripts.db:reset=\"prisma migrate reset --force && npm run db:seed\" scripts.db:studio=\"prisma studio\")",
+      "Bash(npm run:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npx prisma generate:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

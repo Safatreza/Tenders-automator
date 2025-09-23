@@ -1,0 +1,228 @@
+'use client'
+
+import {
+  FileText,
+  Upload,
+  CheckSquare,
+  Clock,
+  TrendingUp,
+  Play,
+  AlertCircle
+} from 'lucide-react'
+
+export default function DemoPage() {
+  const stats = {
+    totalTenders: 25,
+    processingTenders: 3,
+    readyForReview: 5,
+    approvedTenders: 15,
+    documentsProcessed: 67,
+    activeRuns: 2,
+  }
+
+  const statCards = [
+    {
+      title: 'Total Tenders',
+      value: stats.totalTenders,
+      icon: FileText,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-100',
+    },
+    {
+      title: 'Processing',
+      value: stats.processingTenders,
+      icon: Clock,
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-100',
+    },
+    {
+      title: 'Ready for Review',
+      value: stats.readyForReview,
+      icon: CheckSquare,
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-100',
+    },
+    {
+      title: 'Approved',
+      value: stats.approvedTenders,
+      icon: TrendingUp,
+      color: 'text-green-600',
+      bgColor: 'bg-green-100',
+    },
+  ]
+
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-7xl bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">
+          Tender Automator - Demo UI
+        </h1>
+        <p className="text-gray-600 mt-2">
+          Demo interface showing the tender processing pipeline dashboard
+        </p>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-white rounded-xl border shadow hover:shadow-md transition-shadow cursor-pointer p-6"
+             onClick={() => alert('Upload New Tender feature - Demo UI only')}>
+          <div className="flex items-center space-x-3">
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <Upload className="h-6 w-6 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Upload New Tender</h3>
+              <p className="text-sm text-gray-600">Start processing documents</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border shadow hover:shadow-md transition-shadow cursor-pointer p-6"
+             onClick={() => alert('View All Tenders feature - Demo UI only')}>
+          <div className="flex items-center space-x-3">
+            <div className="bg-green-100 p-3 rounded-lg">
+              <FileText className="h-6 w-6 text-green-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">View All Tenders</h3>
+              <p className="text-sm text-gray-600">Manage existing tenders</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border shadow hover:shadow-md transition-shadow cursor-pointer p-6"
+             onClick={() => alert('Pipeline Runs feature - Demo UI only')}>
+          <div className="flex items-center space-x-3">
+            <div className="bg-purple-100 p-3 rounded-lg">
+              <Play className="h-6 w-6 text-purple-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Pipeline Runs</h3>
+              <p className="text-sm text-gray-600">Monitor processing status</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {statCards.map((stat) => {
+          const Icon = stat.icon
+          return (
+            <div key={stat.title} className="bg-white rounded-xl border shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                  <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                </div>
+                <div className={`p-3 rounded-lg ${stat.bgColor}`}>
+                  <Icon className={`h-6 w-6 ${stat.color}`} />
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-xl border shadow">
+          <div className="p-6 border-b">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-yellow-600" />
+              Items Requiring Attention
+            </h2>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              {stats.readyForReview > 0 && (
+                <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-yellow-800">
+                      {stats.readyForReview} tenders ready for review
+                    </p>
+                    <p className="text-sm text-yellow-600">
+                      These tenders have completed processing and need approval
+                    </p>
+                  </div>
+                  <button
+                    className="px-3 py-1 border border-yellow-300 text-yellow-700 rounded text-sm hover:bg-yellow-100"
+                    onClick={() => alert('Review Tenders feature - Demo UI only')}
+                  >
+                    Review
+                  </button>
+                </div>
+              )}
+
+              {stats.activeRuns > 0 && (
+                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-blue-800">
+                      {stats.activeRuns} active pipeline runs
+                    </p>
+                    <p className="text-sm text-blue-600">
+                      Monitor the progress of ongoing document processing
+                    </p>
+                  </div>
+                  <button
+                    className="px-3 py-1 border border-blue-300 text-blue-700 rounded text-sm hover:bg-blue-100"
+                    onClick={() => alert('Monitor Runs feature - Demo UI only')}
+                  >
+                    Monitor
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border shadow">
+          <div className="p-6 border-b">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-green-600" />
+              System Status
+            </h2>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Pipeline System</span>
+                <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
+                  Operational
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Document Storage</span>
+                <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
+                  Operational
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Field Extraction</span>
+                <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
+                  Operational
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Documents Processed</span>
+                <span className="text-sm text-gray-600">{stats.documentsProcessed} total</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Demo Notice */}
+      <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <div className="flex items-center gap-2">
+          <AlertCircle className="h-5 w-5 text-blue-600" />
+          <p className="text-blue-800 font-medium">Demo Mode</p>
+        </div>
+        <p className="text-blue-700 text-sm mt-1">
+          This is a demonstration interface with static data. Click on any interactive elements to see demo alerts.
+        </p>
+      </div>
+    </div>
+  )
+}

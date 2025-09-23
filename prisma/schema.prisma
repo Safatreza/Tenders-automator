@@ -1,0 +1,366 @@
+// Complete Tender Automator Database Schema
+// Production-ready schema with all entities and relationships
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Authentication & User Management
+// ==========================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          UserRole  @default(ANALYST)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // NextAuth Relations
+  accounts Account[]
+  sessions Session[]
+
+  // App Relations
+  approvals Approval[]
+  auditLogs AuditLog[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ==========================================
+// Core Business Entities
+// ==========================================
+
+model Tender {
+  id          String      @id @default(cuid())
+  title       String
+  agency      String?
+  status      TenderStatus @default(DRAFT)
+  publishedAt DateTime?
+  dueAt       DateTime?
+  sourceId    String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  source           Source?           @relation(fields: [sourceId], references: [id])
+  documents        Document[]
+  fieldExtractions FieldExtraction[]
+  checklistItems   ChecklistItem[]
+  summaryBlocks    SummaryBlock[]
+  runs             Run[]
+  approvals        Approval[]
+  auditLogs        AuditLog[]
+
+  @@map("tenders")
+}
+
+model Document {
+  id       String  @id @default(cuid())
+  tenderId String
+  filename String
+  mime     String
+  sha256   String  @unique
+  pages    Int?
+  version  Int     @default(1)
+  url      String?
+  content  String? @db.Text // Extracted full text content
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tender     Tender      @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  traceLinks TraceLink[]
+
+  @@map("documents")
+}
+
+// ==========================================
+// Citation & Traceability System
+// ==========================================
+
+model TraceLink {
+  id          String  @id @default(cuid())
+  documentId  String
+  page        Int
+  sectionPath String?
+  snippet     String  @db.Text
+  bbox        Json?   // Bounding box coordinates {x, y, width, height}
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  document         Document          @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  fieldExtractions FieldExtraction[]
+  checklistItems   ChecklistItem[]
+  summaryBlocks    SummaryBlock[]
+
+  @@map("trace_links")
+}
+
+// ==========================================
+// Field Extraction System
+// ==========================================
+
+model FieldExtraction {
+  id         String @id @default(cuid())
+  tenderId   String
+  key        String // scope, eligibility, evaluationCriteria, submissionMechanics, deadlineSubmission
+  value      Json   // Structured extracted data
+  confidence Float  @default(1.0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tender     Tender      @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  traceLinks TraceLink[]
+
+  @@unique([tenderId, key])
+  @@map("field_extractions")
+}
+
+// ==========================================
+// Compliance & Checklist System
+// ==========================================
+
+model ChecklistItem {
+  id     String          @id @default(cuid())
+  tenderId String
+  key    String          // Unique identifier within tender
+  label  String          // Human-readable label
+  status ChecklistStatus @default(PENDING)
+  notes  String?         @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tender     Tender      @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  traceLinks TraceLink[]
+
+  @@unique([tenderId, key])
+  @@map("checklist_items")
+}
+
+// ==========================================
+// Summary Generation System
+// ==========================================
+
+model SummaryBlock {
+  id              String @id @default(cuid())
+  tenderId        String
+  blockKey        String // scope, eligibility, evaluation, submission, legal
+  contentMarkdown String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tender     Tender      @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  traceLinks TraceLink[]
+
+  @@unique([tenderId, blockKey])
+  @@map("summary_blocks")
+}
+
+// ==========================================
+// Pipeline Execution System
+// ==========================================
+
+model Run {
+  id           String    @id @default(cuid())
+  tenderId     String
+  pipelineName String
+  status       RunStatus @default(PENDING)
+  startedAt    DateTime  @default(now())
+  finishedAt   DateTime?
+  logs         Json      @default("[]") // Array of step logs
+  error        String?   @db.Text
+
+  // Relations
+  tender Tender @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+
+  @@map("runs")
+}
+
+// ==========================================
+// Template & Configuration Management
+// ==========================================
+
+model Template {
+  id       String       @id @default(cuid())
+  name     String
+  kind     TemplateKind
+  schema   Json         // JSON schema for validation
+  template String       @db.Text // Handlebars template content
+  active   Boolean      @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([kind, name])
+  @@map("templates")
+}
+
+model Pipeline {
+  id     String  @id @default(cuid())
+  name   String  @unique
+  config Json    // YAML configuration as JSON
+  active Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("pipelines")
+}
+
+// ==========================================
+// Source Management
+// ==========================================
+
+model Source {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  baseUrl     String?
+  keywords    String[] @default([])
+  active      Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tenders Tender[]
+
+  @@map("sources")
+}
+
+// ==========================================
+// Approval & Review System
+// ==========================================
+
+model Approval {
+  id       String        @id @default(cuid())
+  tenderId String
+  status   ApprovalStatus
+  by       String        // User ID
+  at       DateTime      @default(now())
+  comment  String?       @db.Text
+
+  // Relations
+  tender Tender @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [by], references: [id])
+
+  @@map("approvals")
+}
+
+// ==========================================
+// Audit Trail System
+// ==========================================
+
+model AuditLog {
+  id       String   @id @default(cuid())
+  actorId  String   // User who performed the action
+  action   String   // Action type (CREATE, UPDATE, DELETE, APPROVE, etc.)
+  entity   String   // Entity type (Tender, Document, etc.)
+  entityId String   // ID of the affected entity
+  diff     Json?    // Changes made (before/after)
+  at       DateTime @default(now())
+
+  // Relations
+  actor  User    @relation(fields: [actorId], references: [id])
+  tender Tender? @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+}
+
+// ==========================================
+// Enums
+// ==========================================
+
+enum UserRole {
+  ANALYST   // Can upload docs, start runs, update checklist items
+  REVIEWER  // Can approve/reject tenders, all analyst permissions
+  ADMIN     // Full system access, user management
+}
+
+enum TenderStatus {
+  DRAFT              // Initial state
+  PROCESSING         // Pipeline running
+  REVIEW             // Ready for reviewer
+  APPROVED           // Approved by reviewer
+  REJECTED           // Rejected by reviewer
+}
+
+enum ChecklistStatus {
+  PENDING  // Not yet checked
+  OK       // Requirements met
+  MISSING  // Requirements not met
+  N_A      // Not applicable
+}
+
+enum RunStatus {
+  PENDING   // Queued for execution
+  RUNNING   // Currently executing
+  COMPLETED // Successfully completed
+  FAILED    // Failed with error
+}
+
+enum TemplateKind {
+  SUMMARY   // Summary generation template
+  CHECKLIST // Checklist validation template
+}
+
+enum ApprovalStatus {
+  APPROVED
+  REJECTED
+}
