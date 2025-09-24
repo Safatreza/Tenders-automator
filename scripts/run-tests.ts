@@ -5,8 +5,7 @@
 
 import { PrismaClient } from '@prisma/client'
 import { TEST_SCENARIOS, PERFORMANCE_BENCHMARKS, TestScenario } from '../src/lib/test-scenarios'
-import { PipelineEngine } from '../src/lib/pipeline'
-const pipelineEngine = new PipelineEngine()
+import { pipelineEngine } from '../src/lib/pipeline'
 import { templateEngine } from '../src/lib/templates'
 
 const prisma = new PrismaClient()
