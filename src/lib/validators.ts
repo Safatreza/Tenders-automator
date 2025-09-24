@@ -251,6 +251,37 @@ export const validateUniqueConstraints = {
 }
 
 // ==========================================
+// API Request/Response Validators
+// ==========================================
+
+export const validateRequestBody = <T>(schema: z.ZodSchema<T>) => {
+  return (body: unknown): T => {
+    return schema.parse(body)
+  }
+}
+
+export const validateSearchParams = <T>(schema: z.ZodSchema<T>) => {
+  return (params: URLSearchParams): T => {
+    const obj: Record<string, string | string[]> = {}
+
+    for (const [key, value] of params.entries()) {
+      if (obj[key]) {
+        // Handle multiple values for same key
+        if (Array.isArray(obj[key])) {
+          (obj[key] as string[]).push(value)
+        } else {
+          obj[key] = [obj[key] as string, value]
+        }
+      } else {
+        obj[key] = value
+      }
+    }
+
+    return schema.parse(obj)
+  }
+}
+
+// ==========================================
 // Export All Validators
 // ==========================================
 

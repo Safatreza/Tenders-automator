@@ -1,3 +1,22 @@
 {
-  "/favicon.ico/route": "app/favicon.ico/route.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/ingest/route": "app/api/ingest/route.js",
+  "/api/pipelines/route": "app/api/pipelines/route.js",
+  "/api/runs/route": "app/api/runs/route.js",
+  "/api/tenders/[id]/approve/route": "app/api/tenders/[id]/approve/route.js",
+  "/api/tenders/[id]/route": "app/api/tenders/[id]/route.js",
+  "/api/tenders/route": "app/api/tenders/route.js",
+  "/api/upload/route": "app/api/upload/route.js",
+  "/auth/signin/page": "app/auth/signin/page.js",
+  "/auth/verify-request/page": "app/auth/verify-request/page.js",
+  "/demo/page": "app/demo/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/ingest/page": "app/ingest/page.js",
+  "/page": "app/page.js",
+  "/runs/page": "app/runs/page.js",
+  "/settings/page": "app/settings/page.js",
+  "/simple/page": "app/simple/page.js",
+  "/tenders/[id]/page": "app/tenders/[id]/page.js",
+  "/tenders/page": "app/tenders/page.js"
 }

@@ -174,7 +174,7 @@ async function main() {
     data: {
       title: 'IT Infrastructure Modernization Project',
       agency: 'Department of Technology',
-      status: TenderStatus.READY_FOR_REVIEW,
+      status: TenderStatus.REVIEW,
       publishedAt: new Date('2024-01-15'),
       dueAt: new Date('2024-03-15'),
       sourceId: govSource.id,

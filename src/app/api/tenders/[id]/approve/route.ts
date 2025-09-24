@@ -14,7 +14,7 @@ const ApprovalSchema = z.object({
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -27,7 +27,7 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const tenderId = params.id
+    const { id: tenderId } = await params
 
     // Check if tender exists and is ready for review
     const existingTender = await prisma.tender.findUnique({
@@ -154,7 +154,7 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -162,7 +162,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const tenderId = params.id
+    const { id: tenderId } = await params
 
     // Get all approvals for this tender
     const approvals = await prisma.approval.findMany({

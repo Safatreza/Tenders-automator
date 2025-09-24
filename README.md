@@ -1,6 +1,8 @@
 # Tender Automator
 
-A production-ready Next.js application that automates tender document processing with AI-powered field extraction, citation tracking, and approval workflows.
+> **Transform raw tender PDFs/URLs into supervisor-ready summaries + compliance checklists with page-level traceability, full audit trails, and reviewer approval workflows.**
+
+A complete, production-ready tender automation system built with Next.js 15, TypeScript, and PostgreSQL. Deployed on Vercel with comprehensive document processing, field extraction, and approval workflows.
 
 ## 🚀 Features
 
