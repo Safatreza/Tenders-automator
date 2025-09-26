@@ -4,9 +4,11 @@
 import Handlebars from 'handlebars'
 import { prisma } from '@/lib/prisma'
 
+import type { TenderWithDetails, FieldExtractionWithTrace } from '@/types/api-responses'
+
 export interface TemplateContext {
-  tender: any
-  extractions: Record<string, any>
+  tender: TenderWithDetails
+  extractions: Record<string, FieldExtractionWithTrace>
   metadata: {
     generatedAt: Date
     templateName: string
@@ -21,8 +23,8 @@ export interface SummaryBlock {
     documentId: string
     page: number
     snippet: string
-    sectionPath?: string
-    bbox?: any
+    sectionPath?: string | null
+    bbox?: Record<string, number> | null
   }>
 }
 
@@ -35,8 +37,8 @@ export interface ChecklistItem {
     documentId: string
     page: number
     snippet: string
-    sectionPath?: string
-    bbox?: any
+    sectionPath?: string | null
+    bbox?: Record<string, number> | null
   }>
 }
 
@@ -69,18 +71,28 @@ export class TemplateEngine {
     })
 
     // Helper to check if value exists and has confidence
-    Handlebars.registerHelper('hasValue', (extraction: any) => {
+    Handlebars.registerHelper('hasValue', (extraction: FieldExtractionWithTrace) => {
       return extraction && extraction.value && extraction.confidence > 0.3
     })
 
     // Helper to get field summary
-    Handlebars.registerHelper('summary', (extraction: any) => {
+    Handlebars.registerHelper('summary', (extraction: FieldExtractionWithTrace) => {
       if (!extraction || !extraction.value) return 'Not found'
-      return extraction.value.summary || 'Available'
+      const value = extraction.value as Record<string, unknown>
+      return value.summary || 'Available'
     })
 
     // Helper for conditional rendering
-    Handlebars.registerHelper('ifCond', function(v1: any, operator: string, v2: any, options: any) {
+    Handlebars.registerHelper('ifCond', function(
+      this: unknown,
+      v1: unknown,
+      operator: string,
+      v2: unknown,
+      options: {
+        fn: (context?: unknown) => string
+        inverse: (context?: unknown) => string
+      }
+    ) {
       switch (operator) {
         case '==': return (v1 == v2) ? options.fn(this) : options.inverse(this)
         case '===': return (v1 === v2) ? options.fn(this) : options.inverse(this)
@@ -94,7 +106,7 @@ export class TemplateEngine {
     })
   }
 
-  async getTemplate(name: string): Promise<{ template: string; schema: any }> {
+  async getTemplate(name: string): Promise<{ template: string; schema: Record<string, unknown> }> {
     const templateRecord = await prisma.template.findFirst({
       where: { name, active: true }
     })
@@ -106,11 +118,11 @@ export class TemplateEngine {
 
     return {
       template: templateRecord.template,
-      schema: templateRecord.schema as any
+      schema: templateRecord.schema as Record<string, unknown>
     }
   }
 
-  private getDefaultTemplate(name: string): { template: string; schema: any } {
+  private getDefaultTemplate(name: string): { template: string; schema: Record<string, unknown> } {
     if (name.includes('summary')) {
       return {
         template: this.getDefaultSummaryTemplate(),
@@ -498,7 +510,13 @@ export class TemplateEngine {
   }
 }
 
+// Create and export template engine instance
 export const templateEngine = new TemplateEngine()
 
-// Export constants for seeding
+// Export as default for different import patterns
+export default templateEngine
+
+// Export the class (already exported above in class definition)
+
+// Export constants for seeding (if they exist)
 export { DEFAULT_SUMMARY_TEMPLATE, DEFAULT_CHECKLIST_SCHEMA } from './constants'

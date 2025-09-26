@@ -5,8 +5,8 @@
 
 import { PrismaClient } from '@prisma/client'
 import { TEST_SCENARIOS, PERFORMANCE_BENCHMARKS, TestScenario } from '../src/lib/test-scenarios'
-import { pipelineEngine } from '../src/lib/pipeline'
-import { templateEngine } from '../src/lib/templates'
+import pipelineEngine from '../src/lib/pipeline'
+import templateEngine from '../src/lib/templates'
 
 const prisma = new PrismaClient()
 
@@ -188,7 +188,7 @@ class TestRunner {
   private async testBasicExtraction(errors: string[]): Promise<void> {
     try {
       // Verify extractors are properly registered
-      const { FIELD_EXTRACTORS } = await import('../src/lib/extractors')
+      const FIELD_EXTRACTORS = (await import('../src/lib/extractors')).default
 
       if (!FIELD_EXTRACTORS || FIELD_EXTRACTORS.length !== 5) {
         errors.push(`Expected 5 extractors, found ${FIELD_EXTRACTORS?.length || 0}`)
@@ -212,7 +212,7 @@ class TestRunner {
     // This would involve testing with actual low-quality documents
     // For now, validate error handling exists
     try {
-      const { FIELD_EXTRACTORS } = await import('../src/lib/extractors')
+      const FIELD_EXTRACTORS = (await import('../src/lib/extractors')).default
       const mockContext = {
         document: { id: 'test', content: '', pages: [] },
         allDocuments: []
@@ -325,8 +325,8 @@ class TestRunner {
   private async testDocumentUpload(errors: string[]): Promise<void> {
     // Test document storage system
     try {
-      const { VercelBlobStorage } = await import('../src/lib/storage/vercel-blob')
-      const storage = new VercelBlobStorage()
+      const { storageService } = await import('../src/lib/storage/vercel-blob')
+      const storage = storageService
 
       if (typeof storage.uploadFile !== 'function') {
         errors.push('Document upload functionality not properly implemented')

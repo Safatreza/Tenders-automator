@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from '@/components/ui/hover-card'
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { FileText, ExternalLink } from 'lucide-react'
@@ -85,8 +85,8 @@ export function TraceChip({
   }
 
   return (
-    <HoverCard open={isOpen} onOpenChange={setIsOpen}>
-      <HoverCardTrigger asChild>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
         {children ? (
           <span className="relative">
             {children}
@@ -97,8 +97,8 @@ export function TraceChip({
         ) : (
           renderTrigger()
         )}
-      </HoverCardTrigger>
-      <HoverCardContent className="w-96 p-4" side="top">
+      </PopoverTrigger>
+      <PopoverContent className="w-96 p-4" side="top">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-semibold">Citations</h4>
@@ -151,8 +151,8 @@ export function TraceChip({
             </div>
           )}
         </div>
-      </HoverCardContent>
-    </HoverCard>
+      </PopoverContent>
+    </Popover>
   )
 }
 

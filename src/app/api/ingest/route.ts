@@ -151,7 +151,7 @@ async function handleFileUpload(request: NextRequest, session: any) {
       filename: file.name,
       contentType: file.type,
       buffer,
-      size: file.size,
+      // size removed - not part of FileInfo interface
     })
 
     // Log file upload
@@ -295,7 +295,7 @@ async function handleUrlIngestion(request: NextRequest, session: any) {
       filename: finalFilename,
       contentType,
       buffer,
-      size: buffer.length,
+      // size removed - not part of FileInfo interface
     })
 
     // Log URL ingestion
@@ -336,7 +336,7 @@ async function handleUrlIngestion(request: NextRequest, session: any) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
+        { error: 'Validation error', details: error.issues },
         { status: 400 }
       )
     }

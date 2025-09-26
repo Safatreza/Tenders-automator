@@ -1,5 +1,5 @@
 import { PrismaClient, UserRole, TenderStatus, ChecklistStatus, TemplateKind, ApprovalStatus, RunStatus } from '@prisma/client'
-import { DEFAULT_SUMMARY_TEMPLATE, DEFAULT_CHECKLIST_SCHEMA } from '../src/lib/templates'
+import { DEFAULT_SUMMARY_TEMPLATE, DEFAULT_CHECKLIST_SCHEMA } from '../src/lib/templates/constants'
 
 const prisma = new PrismaClient()
 

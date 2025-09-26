@@ -229,4 +229,5 @@ class VercelBlobStorage {
 export const storageService = new VercelBlobStorage()
 
 // Export types for backward compatibility
-export type { UploadFileParams, FileMetadata }
+// Export types with aliases to avoid conflicts
+export type { UploadFileParams as VBUploadFileParams, FileMetadata as VBFileMetadata }

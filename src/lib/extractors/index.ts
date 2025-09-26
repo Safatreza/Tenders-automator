@@ -46,13 +46,32 @@ import { EvaluationCriteriaExtractor } from './evaluation-criteria-extractor'
 import { SubmissionMechanicsExtractor } from './submission-mechanics-extractor'
 import { DeadlineSubmissionExtractor } from './deadline-submission-extractor'
 
+// Create extractor instances
+const scopeExtractor = new ScopeExtractor()
+const eligibilityExtractor = new EligibilityExtractor()
+const evaluationCriteriaExtractor = new EvaluationCriteriaExtractor()
+const submissionMechanicsExtractor = new SubmissionMechanicsExtractor()
+const deadlineSubmissionExtractor = new DeadlineSubmissionExtractor()
+
 export const FIELD_EXTRACTORS: FieldExtractor[] = [
-  new ScopeExtractor(),
-  new EligibilityExtractor(),
-  new EvaluationCriteriaExtractor(),
-  new SubmissionMechanicsExtractor(),
-  new DeadlineSubmissionExtractor(),
+  scopeExtractor,
+  eligibilityExtractor,
+  evaluationCriteriaExtractor,
+  submissionMechanicsExtractor,
+  deadlineSubmissionExtractor,
 ]
+
+// Export individual extractors for direct use
+export {
+  scopeExtractor,
+  eligibilityExtractor,
+  evaluationCriteriaExtractor,
+  submissionMechanicsExtractor,
+  deadlineSubmissionExtractor
+}
+
+// Export as default too
+export default FIELD_EXTRACTORS
 
 export const getExtractorByKey = (key: string): FieldExtractor | undefined => {
   return FIELD_EXTRACTORS.find(extractor => extractor.key === key)

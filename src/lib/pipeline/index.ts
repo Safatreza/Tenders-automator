@@ -596,3 +596,7 @@ export class PipelineEngine {
 }
 
 export const pipelineEngine = new PipelineEngine()
+
+// Export the class and instance for different import patterns
+export default pipelineEngine
+export { PipelineEngine }

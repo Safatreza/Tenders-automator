@@ -279,7 +279,7 @@ class SystemValidator {
     try {
       // Check pipeline engine
       const pipelineModule = await import('../src/lib/pipeline')
-      const hasPipelineEngine = !!pipelineModule.pipelineEngine
+      const hasPipelineEngine = !!(pipelineModule.default || pipelineModule.pipelineEngine)
 
       this.results.push({
         category: 'Pipeline',
@@ -289,7 +289,7 @@ class SystemValidator {
       })
 
       if (hasPipelineEngine) {
-        const engine = pipelineModule.pipelineEngine
+        const engine = pipelineModule.default || pipelineModule.pipelineEngine
         const hasExecuteMethod = typeof engine.executePipeline === 'function'
         const hasLoadMethod = typeof engine.loadPipelineConfig === 'function'
 
@@ -336,18 +336,19 @@ class SystemValidator {
     try {
       // Check extractors module
       const extractorsModule = await import('../src/lib/extractors')
-      const hasFieldExtractors = Array.isArray(extractorsModule.FIELD_EXTRACTORS)
+      const extractors = extractorsModule.default || extractorsModule.FIELD_EXTRACTORS
+      const hasFieldExtractors = Array.isArray(extractors)
 
       this.results.push({
         category: 'Extractors',
         test: 'Field extractors array',
         passed: hasFieldExtractors,
-        details: hasFieldExtractors ? `Found ${extractorsModule.FIELD_EXTRACTORS.length} extractors` : 'Missing or invalid'
+        details: hasFieldExtractors ? `Found ${extractors.length} extractors` : 'Missing or invalid'
       })
 
       if (hasFieldExtractors) {
         const requiredExtractors = ['scope', 'eligibility', 'evaluationCriteria', 'submissionMechanics', 'deadlineSubmission']
-        const extractors = extractorsModule.FIELD_EXTRACTORS
+        // extractors already defined above
 
         for (const extractorKey of requiredExtractors) {
           const extractor = extractors.find((e: any) => e.key === extractorKey)
