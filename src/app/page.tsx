@@ -9,7 +9,6 @@ import {
   CheckSquare,
   Clock,
   TrendingUp,
-  Users,
   Play,
   AlertCircle
 } from 'lucide-react'
@@ -75,7 +74,7 @@ export default function DashboardPage() {
           Welcome back, {session?.user?.name || session?.user?.email}
         </h1>
         <p className="text-gray-600 mt-2">
-          Here's what's happening with your tender processing pipeline
+          Here&apos;s what&apos;s happening with your tender processing pipeline
         </p>
       </div>
 

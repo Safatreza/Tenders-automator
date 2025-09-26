@@ -5,7 +5,7 @@ import { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import EmailProvider from 'next-auth/providers/email'
 import { prisma } from './prisma'
-import { sendMagicLinkEmail } from './email'
+// import { sendMagicLinkEmail } from './email'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -20,14 +20,15 @@ export const authOptions: NextAuthOptions = {
         },
       },
       from: process.env.EMAIL_FROM,
-      sendVerificationRequest: async ({ identifier, url, provider }) => {
-        try {
-          await sendMagicLinkEmail(identifier, url)
-        } catch (error) {
-          console.error('Failed to send verification email:', error)
-          throw new Error('Failed to send verification email')
-        }
-      },
+      // Use default email sending for now - configure in production
+      // sendVerificationRequest: async ({ identifier, url, provider }) => {
+      //   try {
+      //     await sendMagicLinkEmail(identifier, url)
+      //   } catch (error) {
+      //     console.error('Failed to send verification email:', error)
+      //     throw new Error('Failed to send verification email')
+      //   }
+      // },
     }),
   ],
   pages: {
